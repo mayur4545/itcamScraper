@@ -1,0 +1,85 @@
+        private static void runMacro()
+        {
+            // Object for missing (or optional) arguments.
+            object oMissing = System.Reflection.Missing.Value;
+
+            // Create an instance of Microsoft Excel
+            Excel.ApplicationClass oExcel = new Excel.ApplicationClass();
+
+            // Make it visible
+            oExcel.Visible = true;
+
+            // Define Workbooks
+            Excel.Workbooks oBooks = oExcel.Workbooks;
+            Excel._Workbook oBook = null;
+
+            // Get the file path
+            string path = Environment.CurrentDirectory + "\\" + "WSI2PerfReports3.xlsm";
+
+            //Open the file, using the 'path' variable
+            oBook = oBooks.Open(path, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing);
+
+            // Run the macro, "First_Macro"
+            RunMacro(oExcel, new Object[] { "drawlAll"});
+
+            // Quit Excel and clean up.
+            oBook.Close(false, oMissing, oMissing);
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(oBook);
+            oBook = null;
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(oBooks);
+            oBooks = null;
+            oExcel.Quit();
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(oExcel);
+            oExcel = null;
+
+            //Garbage collection
+            GC.Collect();
+        }
+
+        private static void RunMacro(object oApp, object[] oRunArgs)
+        {
+            oApp.GetType().InvokeMember("Run", System.Reflection.BindingFlags.Default | System.Reflection.BindingFlags.InvokeMethod, null, oApp, oRunArgs);
+        }
+        private static void runMacro2()
+        {
+            //~~> Define your Excel Objects
+            Excel.Application xlApp = new Excel.Application();
+
+            Excel.Workbook xlWorkBook;
+            string path = Environment.CurrentDirectory + "\\" + "WSI2PerfReports.xlsm";
+            //~~> Start Excel and open the workbook.
+            object oMissing = System.Reflection.Missing.Value;
+            xlWorkBook = xlApp.Workbooks.Open(path, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing);
+
+            //~~> Run the macros by supplying the necessary arguments
+            xlApp.Run("drawAll", "Jul_10_2016", "Demo to run Excel macros from C#", oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing, oMissing);
+
+            //~~> Clean-up: Close the workbook
+            xlWorkBook.Close(false,path, oMissing);
+
+            //~~> Quit the Excel Application
+            xlApp.Quit();
+
+            //~~> Clean Up
+            releaseObject(xlApp);
+            releaseObject(xlWorkBook);
+        }
+
+        //~~> Release the objects
+        private static void releaseObject(object obj)
+        {
+            try
+            {
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
+                obj = null;
+            }
+            catch (Exception ex)
+            {
+                obj = null;
+            }
+            finally
+            {
+                GC.Collect();
+            }
+        }
+    
