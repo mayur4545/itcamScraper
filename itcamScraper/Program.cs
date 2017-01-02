@@ -17,6 +17,8 @@ namespace itcamScraper
            // createBatFile(batFile);
            // runBatFile(batFile);
 
+
+            //Check last files uploaded last 30 days
             copyFileFolder();
             createBatFile(batFile);
             runBatFile(batFile);
