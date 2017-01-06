@@ -134,7 +134,7 @@ namespace itcamScraper
             }
             catch (Exception ex)
             {
-                logError(ex.StackTrace.ToString() + "string batFile= " + batFile);
+                logError(ex.StackTrace.ToString() + "string batFile= " + batFile + "proc.StartInfo.WorkingDirectory= " + proc.StartInfo.WorkingDirectory);
             }
 
         }
