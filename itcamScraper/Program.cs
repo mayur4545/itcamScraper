@@ -134,7 +134,7 @@ namespace itcamScraper
             }
             catch (Exception ex)
             {
-                logError(ex.StackTrace.ToString());
+                logError(ex.StackTrace.ToString() + "string batFile= " + batFile);
             }
 
         }
@@ -144,7 +144,7 @@ namespace itcamScraper
             try
             {
                 Directory.CreateDirectory(Environment.CurrentDirectory + "\\errorLog");
-                StreamWriter sw = new StreamWriter(Environment.CurrentDirectory + "\\errorLog\\" + "errorLog" + DateTime.Now.AddDays(-1).ToString("yyyy_MM_dd_HH_ss") + ".txt");
+                StreamWriter sw = new StreamWriter(Environment.CurrentDirectory + "\\errorLog\\" + "errorLog" + DateTime.Now.ToString("yyyy_MM_dd_HH_ss") + ".txt");
                 sw.WriteLine(errorMsg);
                 sw.Close();
                 Console.Write(errorMsg + " Enter any key to exit");
@@ -168,8 +168,7 @@ namespace itcamScraper
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace.ToString());
-                Console.ReadKey();
+                logError(ex.StackTrace.ToString() + "string batFile= " + batFile + ", string scrapeDate= " + scrapeDate + " string command= " + command);
             }
         }
 
