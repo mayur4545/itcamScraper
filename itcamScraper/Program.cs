@@ -93,12 +93,12 @@ namespace itcamScraper
             }
             for(int j=0; j<dates.Count; j++)
             {
-                if(folderExists(dates[j].ToString()))
+                if(!folderExists(dates[j].ToString()))
                 {
                     scrapeDates.Add(dates[j].ToString());
                 }
             }
-            return dates;
+            return scrapeDates;
         }
 
         private static bool folderExists(string date)
@@ -115,7 +115,7 @@ namespace itcamScraper
             string year = dateStrings[2];
 
             string path = networkFolder + "\\" + year + "\\" + month + "\\" + month + "_" + day + "_" + year ;
-            Console.Write(path + " found=" + Directory.Exists(path));
+            Console.WriteLine(path + " found=" + Directory.Exists(path));
             return Directory.Exists(path);
             
         }
