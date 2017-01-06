@@ -80,6 +80,7 @@
     <None Include="release4.zip" />
     <None Include="release5.zip" />
     <None Include="release6.zip" />
+    <None Include="release7.zip" />
     <None Include="source\WSI2_PROD_PERF\2016\Summary.xlsx" />
     <None Include="source\WSI2_PROD_PERF\2016\WSI2PerfReports.xlsm" />
     <None Include="source\WSI2_PROD_PERF\ItcamWSI2.props" />

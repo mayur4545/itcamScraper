@@ -22,6 +22,9 @@ namespace itcamScraper
             ArrayList dates = checkTargetFolder();
             Console.WriteLine("ITCAM Scraper will process " + dates.Count.ToString() + " days worth of data");
             string itCamPass = new StreamReader(Environment.CurrentDirectory + "\\itCamPassword.txt").ReadLine();
+            string networkFolder = new StreamReader(Environment.CurrentDirectory + "\\networkTargetFolderPath.txt").ReadLine();
+            string myDocFolder = new StreamReader(Environment.CurrentDirectory + "\\myDocsTargetFolderPath.txt").ReadLine();
+
             for (int i=0; i<dates.Count; i++)
             {
                 Console.WriteLine("Processing ITCAM data for " + dates[i].ToString());
@@ -35,6 +38,28 @@ namespace itcamScraper
                 runAutoItScript(dates[i].ToString());
                 //kill excel process
                 killSpecificExcelFileProcess("EXCEL");
+                //Copy Finished files to target folder
+                DateTime pdate = DateTime.Parse(dates[i].ToString());
+                string[] dateStrings = pdate.ToString("MMM dd yyyy").Split(' ');
+                string month = dateStrings[0];
+                string day = dateStrings[1];
+                if (day.StartsWith("0"))
+                {
+                    day = day.TrimStart('0');
+                }
+                string year = dateStrings[2];
+
+                string netPath = networkFolder + "\\WSI2_PROD_PERF\\" + year + "\\" + month + "\\" + month + "_" + day + "_" + year;
+                string sourcePath = myDocFolder + "\\WSI2_PROD_PERF\\" + year + "\\" + month + "\\" + month + "_" + day + "_" + year;
+                try
+                {
+                    CopyFolder(sourcePath, netPath);
+                }
+                catch (Exception ex)
+                {
+                    logError(ex.ToString() + " CopyFolder(sourcePath, netPath) " + "sourcePath= " + sourcePath + " netPath= " + netPath);
+                }
+
             }
 
         }
@@ -72,7 +97,7 @@ namespace itcamScraper
 
         private static bool folderExists(string date)
         {
-            string networkFolder = new StreamReader(Environment.CurrentDirectory + "\\networkTargetFolderPath.txt").ReadLine();
+            string networkFolder = new StreamReader(Environment.CurrentDirectory + "\\networkTargetFolderPath.txt").ReadLine() + "\\WSI2_PROD_PERF\\";
             DateTime pdate = DateTime.Parse(date);
             string[] dateStrings = pdate.ToString("MMM dd yyyy").Split(' ');
             string month = dateStrings[0];
