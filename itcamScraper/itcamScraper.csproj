@@ -74,6 +74,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Release.zip" />
+    <None Include="source\WSI2_PROD_PERF\2016\Summary.xlsx" />
+    <None Include="source\WSI2_PROD_PERF\2016\WSI2PerfReports.xlsm" />
+    <None Include="source\WSI2_PROD_PERF\ItcamWSI2.props" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
@@ -97,6 +101,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ExcelMacro.exe" />
+    <Content Include="source\WSI2_PROD_PERF\DailyGathering.jar" />
+    <Content Include="source\WSI2_PROD_PERF\jsoup-1.8.3.jar" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="obj\" />
+    <Folder Include="source\WSI2_PROD_PERF\2016\TopReports\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
