@@ -124,7 +124,7 @@ namespace itcamScraper
             {
                 string myDocFolder = new StreamReader(Environment.CurrentDirectory + "\\myDocsTargetFolderPath.txt").ReadLine();
                 proc = new Process();
-                proc.StartInfo.WorkingDirectory = myDocFolder + "WSI2_PROD_PERF\\";
+                proc.StartInfo.WorkingDirectory = myDocFolder + "\\WSI2_PROD_PERF\\";
                 proc.StartInfo.FileName = batFile;
                 proc.StartInfo.CreateNoWindow = false;
                 proc.Start();
