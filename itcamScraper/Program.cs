@@ -87,7 +87,7 @@ namespace itcamScraper
                 day = day.TrimStart('0');
             }
             string year = dateStrings[2];
-            string command = "\"" + myDocFolder + "\\ExcelMacro.exe" + "\" " + "\"" + month + "_" + day + "_" + year + "\"";
+            string command =  myDocFolder + "\\WSI2_PROD_PERF\\ExcelMacro.exe " + "\"" + myDocFolder + "\\WSI2_PROD_PERF\\" + year + "\\WSI2PerfReports.xlsm" + " \"" + month + "_" + day + "_" + year + "\"";
             //run Java Application to download csv files for 1 specific date
             createBatFile(batFile, scrapeDate, command);
             runBatFile(batFile);
