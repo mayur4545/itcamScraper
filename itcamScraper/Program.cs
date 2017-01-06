@@ -33,11 +33,16 @@ namespace itcamScraper
                 string javaCommand = "java -cp DailyGathering.jar;jsoup-1.8.3.jar gov.ca.dmv.ea.perf.ItcamWSI2 ItcamWSI2.props " + dates[i].ToString() + " \"" + itCamPass + "\"";
                 //run Java Application to download csv files for 1 specific date
                 createBatFile(javaBatFile, dates[i].ToString(), javaCommand);
+                Console.WriteLine("Executing: " + javaBatFile);
                 runBatFile(javaBatFile);
                 //run AutoIt script to open and run VB Script in Excel file
+                Console.WriteLine("Executing: runAutoItScript for date" + dates[i].ToString());
                 runAutoItScript(dates[i].ToString());
                 //kill excel process
+                Console.WriteLine("Killing Excel Process(es)");
                 killSpecificExcelFileProcess("EXCEL");
+                Console.WriteLine("Waiting 5 seconds for Excel to be killed");
+                Thread.Sleep(5000); //wait 5 seconds before copying files
                 //Copy Finished files to target folder
                 DateTime pdate = DateTime.Parse(dates[i].ToString());
                 string[] dateStrings = pdate.ToString("MMM dd yyyy").Split(' ');
@@ -53,11 +58,12 @@ namespace itcamScraper
                 string sourcePath = myDocFolder + "\\WSI2_PROD_PERF\\" + year + "\\" + month + "\\" + month + "_" + day + "_" + year;
                 try
                 {
+                    Console.WriteLine("Copying " + sourcePath + " to " + netPath);
                     CopyFolder(sourcePath, netPath);
                 }
                 catch (Exception ex)
                 {
-                    logError(ex.ToString() + " CopyFolder(sourcePath, netPath) " + "sourcePath= " + sourcePath + " netPath= " + netPath);
+                   // logError(ex.ToString() + " CopyFolder(sourcePath, netPath) " + "sourcePath= " + sourcePath + " netPath= " + netPath);
                 }
 
             }
@@ -109,6 +115,7 @@ namespace itcamScraper
             string year = dateStrings[2];
 
             string path = networkFolder + "\\" + year + "\\" + month + "\\" + month + "_" + day + "_" + year ;
+            Console.Write(path + " found=" + Directory.Exists(path));
             return Directory.Exists(path);
             
         }
@@ -167,9 +174,8 @@ namespace itcamScraper
                 proc.StartInfo.FileName = batFile;
                 proc.StartInfo.CreateNoWindow = false;
                 proc.Start();
-                Console.WriteLine("proc.StartInfo.WorkingDirectory: " + proc.StartInfo.WorkingDirectory + " executed");
+                Console.WriteLine("proc.StartInfo.WorkingDirectory: " + proc.StartInfo.WorkingDirectory + " " + batFile + " executed");
                 proc.WaitForExit();
-                Console.WriteLine( batFile + " executed");
             }
             catch (Exception ex)
             {
