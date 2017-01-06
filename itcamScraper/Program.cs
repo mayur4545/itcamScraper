@@ -33,8 +33,22 @@ namespace itcamScraper
                 runBatFile(javaBatFile);
                 //run AutoIt script to open and run VB Script in Excel file
                 runAutoItScript(dates[i].ToString());
+                //kill excel process
+                killSpecificExcelFileProcess("EXCEL");
             }
 
+        }
+
+        private static void killSpecificExcelFileProcess(string processName)
+        {
+            var processes = from p in Process.GetProcessesByName(processName)
+                            select p;
+
+            foreach (var process in processes)
+            {
+
+                process.Kill();
+            }
         }
 
         private static ArrayList checkTargetFolder()
@@ -87,7 +101,7 @@ namespace itcamScraper
                 day = day.TrimStart('0');
             }
             string year = dateStrings[2];
-            string command =  myDocFolder + "\\WSI2_PROD_PERF\\ExcelMacro.exe " + "\"" + myDocFolder + "\\WSI2_PROD_PERF\\" + year + "\\WSI2PerfReports.xlsm" + " \"" + month + "_" + day + "_" + year + "\"";
+            string command =  myDocFolder + "\\WSI2_PROD_PERF\\ExcelMacro.exe " + "\"" + myDocFolder + "\\WSI2_PROD_PERF\\" + year + "\\WSI2PerfReports.xlsm\"" + " \"" + month + "_" + day + "_" + year + "\"";
             //run Java Application to download csv files for 1 specific date
             createBatFile(batFile, scrapeDate, command);
             runBatFile(batFile);
