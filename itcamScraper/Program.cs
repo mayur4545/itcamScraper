@@ -6,6 +6,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Collections;
 using System.Threading;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace itcamScraper
 {
@@ -27,23 +28,6 @@ namespace itcamScraper
 
             for (int i=0; i<dates.Count; i++)
             {
-                Console.WriteLine("Processing ITCAM data for " + dates[i].ToString());
-                //Thread.Sleep(5000);
-                string javaBatFile = "itcamscraper.bat";
-                string javaCommand = "java -cp DailyGathering.jar;jsoup-1.8.3.jar gov.ca.dmv.ea.perf.ItcamWSI2 ItcamWSI2.props " + dates[i].ToString() + " \"" + itCamPass + "\"";
-                //run Java Application to download csv files for 1 specific date
-                createBatFile(javaBatFile, dates[i].ToString(), javaCommand);
-                Console.WriteLine("Executing: " + javaBatFile);
-                runBatFile(javaBatFile);
-                //run AutoIt script to open and run VB Script in Excel file
-                Console.WriteLine("Executing: runAutoItScript for date" + dates[i].ToString());
-                runAutoItScript(dates[i].ToString());
-                //kill excel process
-                Console.WriteLine("Killing Excel Process(es)");
-                killSpecificExcelFileProcess("EXCEL");
-                Console.WriteLine("Waiting 5 seconds for Excel to be killed");
-                Thread.Sleep(5000); //wait 5 seconds before copying files
-                //Copy Finished files to target folder
                 DateTime pdate = DateTime.Parse(dates[i].ToString());
                 string[] dateStrings = pdate.ToString("MMM dd yyyy").Split(' ');
                 string month = dateStrings[0];
@@ -56,18 +40,81 @@ namespace itcamScraper
 
                 string netPath = networkFolder + "\\WSI2_PROD_PERF\\" + year + "\\" + month + "\\" + month + "_" + day + "_" + year;
                 string sourcePath = myDocFolder + "\\WSI2_PROD_PERF\\" + year + "\\" + month + "\\" + month + "_" + day + "_" + year;
-                try
+
+                Console.WriteLine("Processing ITCAM data for " + dates[i].ToString());
+                //Thread.Sleep(5000);
+                string javaBatFile = "itcamscraper.bat";
+                string javaCommand = "java -cp DailyGathering.jar;jsoup-1.8.3.jar gov.ca.dmv.ea.perf.ItcamWSI2 ItcamWSI2.props " + dates[i].ToString() + " \"" + itCamPass + "\"";
+                //run Java Application to download csv files for 1 specific date
+                createBatFile(javaBatFile, dates[i].ToString(), javaCommand);
+                Console.WriteLine("Executing: " + javaBatFile);
+                runBatFile(javaBatFile);
+                if (checkCSVs(sourcePath))
                 {
-                    Console.WriteLine("Copying " + sourcePath + " to " + netPath);
-                    CopyFolder(sourcePath, netPath);
+                    //run AutoIt script to open and run VB Script in Excel file
+                    Console.WriteLine("Executing: runAutoItScript for date" + dates[i].ToString());
+                    runAutoItScript(dates[i].ToString());
+                    //kill excel process
+                    Console.WriteLine("Killing Excel Process(es)");
+                    killSpecificExcelFileProcess("EXCEL");
+                    Console.WriteLine("Waiting 5 seconds for Excel to be killed");
+                    Thread.Sleep(5000); //wait 5 seconds to kill Excel Process before copying files
+                    convertChartToImage(sourcePath + "\\THRU_WSI2_Graph.xlsx", sourcePath);
+
+                    //Copy Finished files to target folder
+                    try
+                    {
+                        Console.WriteLine("Copying " + sourcePath + " to " + netPath);
+                        CopyFolder(sourcePath, netPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        // logError(ex.ToString() + " CopyFolder(sourcePath, netPath) " + "sourcePath= " + sourcePath + " netPath= " + netPath);
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                   // logError(ex.ToString() + " CopyFolder(sourcePath, netPath) " + "sourcePath= " + sourcePath + " netPath= " + netPath);
+                    Console.WriteLine("Could not verify ITCAM .csv files were downloaded with statistical data.  PLEASE CHECK YOUR ITCAM CREDENTIALS AND RETRY.");
+                    Thread.Sleep(15000);
+                    Environment.Exit(0);
                 }
 
             }
 
+        }
+
+        private static void convertChartToImage(string strFilePath, string strDestPath)
+        {
+            try
+            {
+                Excel.Application excel = new Excel.Application();
+                Excel.Workbook wb = excel.Workbooks.Open(strFilePath);
+
+                foreach (Excel.Worksheet ws in wb.Worksheets)
+                {
+                    Excel.ChartObjects chartObjects = (Excel.ChartObjects)(ws.ChartObjects(Type.Missing));
+
+                    foreach (Excel.ChartObject co in chartObjects)
+                    {
+                        Excel.Chart chart = (Excel.Chart)co.Chart;
+                        //                  app.Goto(co, true);
+                        chart.Export(strDestPath + @"\" + chart.Name + ".png", "PNG", false);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                logError(ex.ToString() + "\n Could not convert Excel chart to image \n");
+            }
+
+        }
+
+
+        private static bool checkCSVs(string sourcePath)
+        {   //Checks if the first csv found in the directory contains "javascript", indicating the ITCAM creds used were unsuccessful
+            string[] files = Directory.GetFiles(sourcePath, "*.csv");
+            return !(new StreamReader(files[0]).ReadToEnd().ToUpper().Contains("JAVASCRIPT"));
         }
 
         private static void killSpecificExcelFileProcess(string processName)
@@ -237,6 +284,6 @@ namespace itcamScraper
                 CopyFolder(folder, dest);
             }
         }
-
     }
 }
+
