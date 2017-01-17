@@ -178,12 +178,12 @@ namespace itcamScraper
                 if(Directory.Exists(path))
                 {
                     Console.WriteLine("Today's date already found, deleting to get today's latest data " + " found=" + Directory.Exists(path));
-                    Directory.Delete(path);
+                    Directory.Delete(path, true);
                 }
                 if (Directory.Exists(sourcePath))
                 {
                     Console.WriteLine("Today's date already found, deleting to get today's latest data " + " found=" + Directory.Exists(sourcePath));
-                    Directory.Delete(sourcePath);
+                    Directory.Delete(sourcePath, true);
                 }
             }
             return Directory.Exists(path);
