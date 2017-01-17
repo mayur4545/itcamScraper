@@ -102,7 +102,7 @@ namespace itcamScraper
                     {
                         Excel.Chart chart = (Excel.Chart)co.Chart;
                         //                  app.Goto(co, true);
-                        chart.Export(strDestPath + @"\" + chart.Name + ".png", "PNG", false);
+                        chart.Export(strDestPath + @"\" + name + ".png", "PNG", false);
                     }
                 }
                 wb.Close();
