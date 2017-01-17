@@ -59,7 +59,11 @@ namespace itcamScraper
                     killSpecificExcelFileProcess("EXCEL");
                     Console.WriteLine("Waiting 5 seconds for Excel to be killed");
                     Thread.Sleep(5000); //wait 5 seconds to kill Excel Process before copying files
-                    convertChartToImage(sourcePath + "\\THRU_WSI2_Graph.xlsx", sourcePath);
+                    convertChartToImage(sourcePath + "\\THRU_WSI2_Graph.xlsx", sourcePath, "THRU_WSI2_Graph");
+                    convertChartToImage(sourcePath + "\\SESS_WSI2_Graph.xlsx", sourcePath, "SESS_WSI2_Graph");
+                    convertChartToImage(sourcePath + "\\CPU_WSI2_Graph.xlsx", sourcePath, "CPU_WSI2_Graph");
+                    convertChartToImage(sourcePath + "\\MEM_WSI2_Graph.xlsx", sourcePath, "MEM_WSI2_Graph");
+                    convertChartToImage(sourcePath + "\\RESP_WSI2_Graph.xlsx", sourcePath, "RESP_WSI2_Graph");
 
                     //Copy Finished files to target folder
                     try
@@ -83,7 +87,7 @@ namespace itcamScraper
 
         }
 
-        private static void convertChartToImage(string strFilePath, string strDestPath)
+        private static void convertChartToImage(string strFilePath, string strDestPath, string name)
         {
             try
             {
@@ -101,6 +105,7 @@ namespace itcamScraper
                         chart.Export(strDestPath + @"\" + chart.Name + ".png", "PNG", false);
                     }
                 }
+                wb.Close();
 
             }
             catch (Exception ex)
@@ -133,8 +138,8 @@ namespace itcamScraper
         {
             ArrayList dates = new ArrayList();
             ArrayList scrapeDates = new ArrayList();
-            String scrapeDate = DateTime.Now.AddDays(-1).ToString("MM dd yyyy");
-            for(int i=1; i<30; i++)
+            String scrapeDate = DateTime.Now.ToString("MM dd yyyy");
+            for(int i=0; i<30; i++)
             {
                 dates.Add(DateTime.Now.AddDays(-i).ToString("MM dd yyyy"));
             }
@@ -151,6 +156,8 @@ namespace itcamScraper
         private static bool folderExists(string date)
         {
             string networkFolder = new StreamReader(Environment.CurrentDirectory + "\\networkTargetFolderPath.txt").ReadLine() + "\\WSI2_PROD_PERF\\";
+            string myDocFolder = new StreamReader(Environment.CurrentDirectory + "\\myDocsTargetFolderPath.txt").ReadLine();
+            
             DateTime pdate = DateTime.Parse(date);
             string[] dateStrings = pdate.ToString("MMM dd yyyy").Split(' ');
             string month = dateStrings[0];
@@ -162,7 +169,22 @@ namespace itcamScraper
             string year = dateStrings[2];
 
             string path = networkFolder + "\\" + year + "\\" + month + "\\" + month + "_" + day + "_" + year ;
+            string sourcePath = myDocFolder + "\\WSI2_PROD_PERF\\" + year + "\\" + month + "\\" + month + "_" + day + "_" + year;
             Console.WriteLine(path + " found=" + Directory.Exists(path));
+            //Updated code for checking if today's date already exists, delete folder and run the script again to get latest data for today.
+            if(DateTime.Now.ToString("MMM dd yyyy").Split(' ') == dateStrings)
+            {
+                if(Directory.Exists(path))
+                {
+                    Console.WriteLine("Today's date already found, deleting to get today's latest data " + " found=" + Directory.Exists(path));
+                    Directory.Delete(path);
+                }
+                if (Directory.Exists(sourcePath))
+                {
+                    Console.WriteLine("Today's date already found, deleting to get today's latest data " + " found=" + Directory.Exists(sourcePath));
+                    Directory.Delete(sourcePath);
+                }
+            }
             return Directory.Exists(path);
             
         }
