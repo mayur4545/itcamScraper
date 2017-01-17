@@ -172,7 +172,8 @@ namespace itcamScraper
             string sourcePath = myDocFolder + "\\WSI2_PROD_PERF\\" + year + "\\" + month + "\\" + month + "_" + day + "_" + year;
             Console.WriteLine(path + " found=" + Directory.Exists(path));
             //Updated code for checking if today's date already exists, delete folder and run the script again to get latest data for today.
-            if(DateTime.Now.ToString("MMM dd yyyy").Split(' ') == dateStrings)
+            string[] today = DateTime.Now.ToString("MMM dd yyyy").Split(' ');
+            if (today[0] == month && today[1]==day && today[2]==year)
             {
                 if(Directory.Exists(path))
                 {
