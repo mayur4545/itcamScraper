@@ -185,6 +185,8 @@ namespace itcamScraper
                     Console.WriteLine("Today's date already found, deleting to get today's latest data " + " found=" + Directory.Exists(sourcePath));
                     Directory.Delete(sourcePath, true);
                 }
+                Thread.Sleep(1500);
+                return false;
             }
             return Directory.Exists(path);
             
