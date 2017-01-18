@@ -194,7 +194,9 @@ namespace itcamScraper
             {
                 if (Directory.Exists(sourcePath))
                 {
-                    string sampleCPUfile = new StreamReader(sourcePath + "\\CPU_WEBS1.csv").ReadToEnd();
+                    StreamReader sr = new StreamReader(sourcePath + "\\CPU_WEBS1.csv");
+                    string sampleCPUfile = sr.ReadToEnd();
+                    sr.Close();
                     int count = Regex.Matches(sampleCPUfile, "N/A").Count;
                     if (count > 5)  //Assumes at least 5 minutes of data is not available, will delete yesterday's incomplete reports and download it again.
                     {
