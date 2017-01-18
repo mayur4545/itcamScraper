@@ -201,11 +201,11 @@ namespace itcamScraper
                     if (count > 5)  //Assumes at least 5 minutes of data is not available, will delete yesterday's incomplete reports and download it again.
                     {
                         Console.WriteLine(count.ToString() + " minutes of data is not available in " +  sourcePath + "\\CPU_WEBS1.csv ; will delete yesterday's incomplete reports and download it again.");
-                        if (Directory.Exists(path))
-                        {
-                            Console.WriteLine("yesterday's date already found, deleting to get yesterday's latest data " + " found=" + Directory.Exists(path));
-                            DeleteDirectory(path);
-                        }
+                        //if (Directory.Exists(path)) //Can't Delete from protected network drive, but copy operation will overwrite old data anyways.
+                        //{
+                        //    Console.WriteLine("yesterday's date already found, deleting to get yesterday's latest data " + " found=" + Directory.Exists(path));
+                        //    DeleteDirectory(path);
+                        //}
                         Console.WriteLine("yesterday's date already found, deleting to get yesterday's latest data " + " found=" + Directory.Exists(sourcePath));
                         DeleteDirectory(sourcePath);
                         Thread.Sleep(1500);
