@@ -179,12 +179,12 @@ namespace itcamScraper
                 if(Directory.Exists(path))
                 {
                     Console.WriteLine("Today's date already found, deleting to get today's latest data " + " found=" + Directory.Exists(path));
-                    DeleteDirectory(path);
+                    Directory.Delete(path, true);
                 }
                 if (Directory.Exists(sourcePath))
                 {
                     Console.WriteLine("Today's date already found, deleting to get today's latest data " + " found=" + Directory.Exists(sourcePath));
-                    DeleteDirectory(sourcePath);
+                    Directory.Delete(sourcePath, true);
                 }
                 Thread.Sleep(1500);
                 return false;
@@ -201,13 +201,13 @@ namespace itcamScraper
                     if (count > 5)  //Assumes at least 5 minutes of data is not available, will delete yesterday's incomplete reports and download it again.
                     {
                         Console.WriteLine(count.ToString() + " minutes of data is not available in " +  sourcePath + "\\CPU_WEBS1.csv ; will delete yesterday's incomplete reports and download it again.");
-                        //if (Directory.Exists(path)) //Can't Delete from protected network drive, but copy operation will overwrite old data anyways.
+                        //if (Directory.Exists(path))
                         //{
                         //    Console.WriteLine("yesterday's date already found, deleting to get yesterday's latest data " + " found=" + Directory.Exists(path));
-                        //    DeleteDirectory(path);
+                        //    Directory.Delete(path, true);
                         //}
                         Console.WriteLine("yesterday's date already found, deleting to get yesterday's latest data " + " found=" + Directory.Exists(sourcePath));
-                        DeleteDirectory(sourcePath);
+                        Directory.Delete(sourcePath, true);
                         Thread.Sleep(1500);
                         return false;
                     }
@@ -216,24 +216,7 @@ namespace itcamScraper
             return Directory.Exists(path);
             
         }
-        public static void DeleteDirectory(string target_dir)
-        {
-            string[] files = Directory.GetFiles(target_dir);
-            string[] dirs = Directory.GetDirectories(target_dir);
 
-            foreach (string file in files)
-            {
-                File.SetAttributes(file, FileAttributes.Normal);
-                File.Delete(file);
-            }
-
-            foreach (string dir in dirs)
-            {
-                DeleteDirectory(dir);
-            }
-
-            Directory.Delete(target_dir, true);
-        }
         private static void runAutoItScript(string scrapeDate)
         {
             string batFile = "autoItExcel.bat";
