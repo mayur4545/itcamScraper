@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Collections;
 using System.Threading;
 using Excel = Microsoft.Office.Interop.Excel;
+using System.Text.RegularExpressions;
 
 namespace itcamScraper
 {
@@ -187,6 +188,28 @@ namespace itcamScraper
                 }
                 Thread.Sleep(1500);
                 return false;
+            }
+            string[] yesterday = DateTime.Now.AddDays(-1).ToString("MMM dd yyyy").Split(' ');
+            if (yesterday[0] == month && yesterday[1] == day && yesterday[2] == year)
+            {
+                if (Directory.Exists(sourcePath))
+                {
+                    string sampleCPUfile = new StreamReader(sourcePath + "\\CPU_WEBS1.csv").ReadToEnd();
+                    int count = Regex.Matches(sampleCPUfile, "N/A").Count;
+                    if (count > 5)  //Assumes at least 5 minutes of data is not available, will delete yesterday's incomplete reports and download it again.
+                    {
+                        Console.WriteLine(count.ToString() + " minutes of data is not available in " +  sourcePath + "\\CPU_WEBS1.csv ; will delete yesterday's incomplete reports and download it again.");
+                        if (Directory.Exists(path))
+                        {
+                            Console.WriteLine("yesterday's date already found, deleting to get yesterday's latest data " + " found=" + Directory.Exists(path));
+                            Directory.Delete(path, true);
+                        }
+                        Console.WriteLine("yesterday's date already found, deleting to get yesterday's latest data " + " found=" + Directory.Exists(sourcePath));
+                        Directory.Delete(sourcePath, true);
+                        Thread.Sleep(1500);
+                        return false;
+                    }
+                }
             }
             return Directory.Exists(path);
             
