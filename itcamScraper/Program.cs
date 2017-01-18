@@ -179,12 +179,12 @@ namespace itcamScraper
                 if(Directory.Exists(path))
                 {
                     Console.WriteLine("Today's date already found, deleting to get today's latest data " + " found=" + Directory.Exists(path));
-                    Directory.Delete(path, true);
+                    DeleteDirectory(path);
                 }
                 if (Directory.Exists(sourcePath))
                 {
                     Console.WriteLine("Today's date already found, deleting to get today's latest data " + " found=" + Directory.Exists(sourcePath));
-                    Directory.Delete(sourcePath, true);
+                    DeleteDirectory(sourcePath);
                 }
                 Thread.Sleep(1500);
                 return false;
@@ -204,10 +204,10 @@ namespace itcamScraper
                         if (Directory.Exists(path))
                         {
                             Console.WriteLine("yesterday's date already found, deleting to get yesterday's latest data " + " found=" + Directory.Exists(path));
-                            Directory.Delete(path, true);
+                            DeleteDirectory(path);
                         }
                         Console.WriteLine("yesterday's date already found, deleting to get yesterday's latest data " + " found=" + Directory.Exists(sourcePath));
-                        Directory.Delete(sourcePath, true);
+                        DeleteDirectory(sourcePath);
                         Thread.Sleep(1500);
                         return false;
                     }
@@ -216,7 +216,24 @@ namespace itcamScraper
             return Directory.Exists(path);
             
         }
+        public static void DeleteDirectory(string target_dir)
+        {
+            string[] files = Directory.GetFiles(target_dir);
+            string[] dirs = Directory.GetDirectories(target_dir);
 
+            foreach (string file in files)
+            {
+                File.SetAttributes(file, FileAttributes.Normal);
+                File.Delete(file);
+            }
+
+            foreach (string dir in dirs)
+            {
+                DeleteDirectory(dir);
+            }
+
+            Directory.Delete(target_dir, true);
+        }
         private static void runAutoItScript(string scrapeDate)
         {
             string batFile = "autoItExcel.bat";
