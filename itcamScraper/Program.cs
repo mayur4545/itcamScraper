@@ -192,22 +192,22 @@ namespace itcamScraper
             string[] yesterday = DateTime.Now.AddDays(-1).ToString("MMM dd yyyy").Split(' ');
             if (yesterday[0] == month && yesterday[1] == day && yesterday[2] == year)
             {
-                if (Directory.Exists(sourcePath))
+                if (Directory.Exists(path))
                 {
-                    StreamReader sr = new StreamReader(sourcePath + "\\CPU_WEBS1.csv");
+                    StreamReader sr = new StreamReader(path + "\\CPU_WEBS1.csv");
                     string sampleCPUfile = sr.ReadToEnd();
                     sr.Close();
                     int count = Regex.Matches(sampleCPUfile, "N/A").Count;
                     if (count > 5)  //Assumes at least 5 minutes of data is not available, will delete yesterday's incomplete reports and download it again.
                     {
-                        Console.WriteLine(count.ToString() + " minutes of data is not available in " +  sourcePath + "\\CPU_WEBS1.csv ; will delete yesterday's incomplete reports and download it again.");
-                        //if (Directory.Exists(path))
-                        //{
-                        //    Console.WriteLine("yesterday's date already found, deleting to get yesterday's latest data " + " found=" + Directory.Exists(path));
-                        //    Directory.Delete(path, true);
-                        //}
-                        Console.WriteLine("yesterday's date already found, deleting to get yesterday's latest data " + " found=" + Directory.Exists(sourcePath));
-                        Directory.Delete(sourcePath, true);
+                        Console.WriteLine(count.ToString() + " minutes of data is not available in " + path + "\\CPU_WEBS1.csv ; will delete yesterday's incomplete reports and download it again.");
+                        if (Directory.Exists(sourcePath))
+                        {
+                            Console.WriteLine("yesterday's date already found locally, deleting to get yesterday's latest data " + " found=" + Directory.Exists(path));
+                            Directory.Delete(sourcePath, true);
+                        }
+                        //Console.WriteLine("yesterday's date already found, deleting to get yesterday's latest data " + " found=" + Directory.Exists(path));
+                        //Directory.Delete(path, true);
                         Thread.Sleep(1500);
                         return false;
                     }
