@@ -185,11 +185,11 @@ namespace itcamScraper
                 string[] today = DateTime.Now.ToString("MMM dd yyyy").Split(' ');
                 if (today[0] == month && today[1] == day && today[2] == year)
                 {
-                    if (Directory.Exists(path))
-                    {
-                        Console.WriteLine("Today's date already found, deleting to get today's latest data " + " found=" + Directory.Exists(path));
-                        Directory.Delete(path, true);
-                    }
+                    //if (Directory.Exists(path))  //No Need to delete from network drive, will be overwritten.
+                    //{
+                    //    Console.WriteLine("Today's date already found, deleting to get today's latest data " + " found=" + Directory.Exists(path));
+                    //    Directory.Delete(path, true);
+                    //}
                     if (Directory.Exists(sourcePath))
                     {
                         Console.WriteLine("Today's date already found, deleting to get today's latest data " + " found=" + Directory.Exists(sourcePath));
