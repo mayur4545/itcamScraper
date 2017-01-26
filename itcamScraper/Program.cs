@@ -111,7 +111,7 @@ namespace itcamScraper
             }
             catch (Exception ex)
             {
-                logError(ex.ToString() + "\n Could not convert Excel chart to image \n");
+                logError(ex.ToString() + "\n Could not convert Excel chart to image"  + strFilePath + " \n");
             }
 
         }
@@ -125,13 +125,20 @@ namespace itcamScraper
 
         private static void killSpecificExcelFileProcess(string processName)
         {
-            var processes = from p in Process.GetProcessesByName(processName)
-                            select p;
-
-            foreach (var process in processes)
+            try
             {
+                var processes = from p in Process.GetProcessesByName(processName)
+                                select p;
 
-                process.Kill();
+                foreach (var process in processes)
+                {
+
+                    process.Kill();
+                }
+            }
+            catch(Exception ex)
+            {
+                logError(ex.ToString() + "\n Could not kill Excel Process \n");
             }
         }
 
@@ -156,65 +163,71 @@ namespace itcamScraper
 
         private static bool folderExists(string date)
         {
-            string networkFolder = new StreamReader(Environment.CurrentDirectory + "\\networkTargetFolderPath.txt").ReadLine() + "\\WSI2_PROD_PERF\\";
-            string myDocFolder = new StreamReader(Environment.CurrentDirectory + "\\myDocsTargetFolderPath.txt").ReadLine();
-            
-            DateTime pdate = DateTime.Parse(date);
-            string[] dateStrings = pdate.ToString("MMM dd yyyy").Split(' ');
-            string month = dateStrings[0];
-            string day = dateStrings[1];
-            if(day.StartsWith("0"))
+            try
             {
-                day = day.TrimStart('0');
-            }
-            string year = dateStrings[2];
+                string networkFolder = new StreamReader(Environment.CurrentDirectory + "\\networkTargetFolderPath.txt").ReadLine() + "\\WSI2_PROD_PERF\\";
+                string myDocFolder = new StreamReader(Environment.CurrentDirectory + "\\myDocsTargetFolderPath.txt").ReadLine();
 
-            string path = networkFolder + "\\" + year + "\\" + month + "\\" + month + "_" + day + "_" + year ;
-            string sourcePath = myDocFolder + "\\WSI2_PROD_PERF\\" + year + "\\" + month + "\\" + month + "_" + day + "_" + year;
-            Console.WriteLine(path + " found=" + Directory.Exists(path));
-            //Updated code for checking if today's date already exists, delete folder and run the script again to get latest data for today.
-            string[] today = DateTime.Now.ToString("MMM dd yyyy").Split(' ');
-            if (today[0] == month && today[1]==day && today[2]==year)
-            {
-                if(Directory.Exists(path))
+                DateTime pdate = DateTime.Parse(date);
+                string[] dateStrings = pdate.ToString("MMM dd yyyy").Split(' ');
+                string month = dateStrings[0];
+                string day = dateStrings[1];
+                if (day.StartsWith("0"))
                 {
-                    Console.WriteLine("Today's date already found, deleting to get today's latest data " + " found=" + Directory.Exists(path));
-                    Directory.Delete(path, true);
+                    day = day.TrimStart('0');
                 }
-                if (Directory.Exists(sourcePath))
+                string year = dateStrings[2];
+
+                string path = networkFolder + "\\" + year + "\\" + month + "\\" + month + "_" + day + "_" + year;
+                string sourcePath = myDocFolder + "\\WSI2_PROD_PERF\\" + year + "\\" + month + "\\" + month + "_" + day + "_" + year;
+                Console.WriteLine(path + " found=" + Directory.Exists(path));
+                //Updated code for checking if today's date already exists, delete folder and run the script again to get latest data for today.
+                string[] today = DateTime.Now.ToString("MMM dd yyyy").Split(' ');
+                if (today[0] == month && today[1] == day && today[2] == year)
                 {
-                    Console.WriteLine("Today's date already found, deleting to get today's latest data " + " found=" + Directory.Exists(sourcePath));
-                    Directory.Delete(sourcePath, true);
-                }
-                Thread.Sleep(1500);
-                return false;
-            }
-            string[] yesterday = DateTime.Now.AddDays(-1).ToString("MMM dd yyyy").Split(' ');
-            if (yesterday[0] == month && yesterday[1] == day && yesterday[2] == year)
-            {
-                if (Directory.Exists(path))
-                {
-                    StreamReader sr = new StreamReader(path + "\\CPU_WEBS1.csv");
-                    string sampleCPUfile = sr.ReadToEnd();
-                    sr.Close();
-                    int count = Regex.Matches(sampleCPUfile, "N/A").Count;
-                    if (count > 5)  //Assumes at least 5 minutes of data is not available, will delete yesterday's incomplete reports and download it again.
+                    if (Directory.Exists(path))
                     {
-                        Console.WriteLine(count.ToString() + " minutes of data is not available in " + path + "\\CPU_WEBS1.csv ; will delete yesterday's incomplete reports and download it again.");
-                        if (Directory.Exists(sourcePath))
+                        Console.WriteLine("Today's date already found, deleting to get today's latest data " + " found=" + Directory.Exists(path));
+                        Directory.Delete(path, true);
+                    }
+                    if (Directory.Exists(sourcePath))
+                    {
+                        Console.WriteLine("Today's date already found, deleting to get today's latest data " + " found=" + Directory.Exists(sourcePath));
+                        Directory.Delete(sourcePath, true);
+                    }
+                    Thread.Sleep(1500);
+                    return false;
+                }
+                string[] yesterday = DateTime.Now.AddDays(-1).ToString("MMM dd yyyy").Split(' ');
+                if (yesterday[0] == month && yesterday[1] == day && yesterday[2] == year)
+                {
+                    if (Directory.Exists(path))
+                    {
+                        StreamReader sr = new StreamReader(path + "\\CPU_WEBS1.csv");
+                        string sampleCPUfile = sr.ReadToEnd();
+                        sr.Close();
+                        int count = Regex.Matches(sampleCPUfile, "N/A").Count;
+                        if (count > 5)  //Assumes at least 5 minutes of data is not available, will delete yesterday's incomplete reports and download it again.
                         {
-                            Console.WriteLine("yesterday's date already found locally, deleting to get yesterday's latest data " + " found=" + Directory.Exists(path));
-                            Directory.Delete(sourcePath, true);
+                            Console.WriteLine(count.ToString() + " minutes of data is not available in " + path + "\\CPU_WEBS1.csv ; will delete yesterday's incomplete reports and download it again.");
+                            if (Directory.Exists(sourcePath))
+                            {
+                                Console.WriteLine("yesterday's date already found locally, deleting to get yesterday's latest data " + " found=" + Directory.Exists(path));
+                                Directory.Delete(sourcePath, true);
+                            }
+                            //Console.WriteLine("yesterday's date already found, deleting to get yesterday's latest data " + " found=" + Directory.Exists(path));
+                            //Directory.Delete(path, true);
+                            Thread.Sleep(1500);
+                            return false;
                         }
-                        //Console.WriteLine("yesterday's date already found, deleting to get yesterday's latest data " + " found=" + Directory.Exists(path));
-                        //Directory.Delete(path, true);
-                        Thread.Sleep(1500);
-                        return false;
                     }
                 }
+                return Directory.Exists(path);
             }
-            return Directory.Exists(path);
-            
+            catch(Exception ex)
+            {
+                return false;
+            }
         }
 
         private static void runAutoItScript(string scrapeDate)
@@ -316,22 +329,29 @@ namespace itcamScraper
 
         static public void CopyFolder(string sourceFolder, string destFolder)
         {
-            if (!Directory.Exists(destFolder))
-                Directory.CreateDirectory(destFolder);
-            string[] files = Directory.GetFiles(sourceFolder);
-            foreach (string file in files)
+            try
             {
-                string name = Path.GetFileName(file);
-                string dest = Path.Combine(destFolder, name);
-                File.Copy(file, dest, true);
-                File.SetAttributes(dest, FileAttributes.Normal);
+                if (!Directory.Exists(destFolder))
+                    Directory.CreateDirectory(destFolder);
+                string[] files = Directory.GetFiles(sourceFolder);
+                foreach (string file in files)
+                {
+                    string name = Path.GetFileName(file);
+                    string dest = Path.Combine(destFolder, name);
+                    File.Copy(file, dest, true);
+                    File.SetAttributes(dest, FileAttributes.Normal);
+                }
+                string[] folders = Directory.GetDirectories(sourceFolder);
+                foreach (string folder in folders)
+                {
+                    string name = Path.GetFileName(folder);
+                    string dest = Path.Combine(destFolder, name);
+                    CopyFolder(folder, dest);
+                }
             }
-            string[] folders = Directory.GetDirectories(sourceFolder);
-            foreach (string folder in folders)
+            catch(Exception ex)
             {
-                string name = Path.GetFileName(folder);
-                string dest = Path.Combine(destFolder, name);
-                CopyFolder(folder, dest);
+
             }
         }
     }
