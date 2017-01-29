@@ -60,17 +60,32 @@ namespace itcamScraper
                     killSpecificExcelFileProcess("EXCEL");
                     Console.WriteLine("Waiting 5 seconds for Excel to be killed");
                     Thread.Sleep(5000); //wait 5 seconds to kill Excel Process before copying files
-                    convertChartToImage(sourcePath + "\\THRU_WSI2_Graph.xlsx", sourcePath, "THRU_WSI2_Graph");
-                    convertChartToImage(sourcePath + "\\SESS_WSI2_Graph.xlsx", sourcePath, "SESS_WSI2_Graph");
-                    convertChartToImage(sourcePath + "\\CPU_WSI2_Graph.xlsx", sourcePath, "CPU_WSI2_Graph");
-                    convertChartToImage(sourcePath + "\\MEM_WSI2_Graph.xlsx", sourcePath, "MEM_WSI2_Graph");
-                    convertChartToImage(sourcePath + "\\RESP_WSI2_Graph.xlsx", sourcePath, "RESP_WSI2_Graph");
-
+                    try
+                    {
+                        convertChartToImage(sourcePath + "\\THRU_WSI2_Graph.xlsx", sourcePath, "THRU_WSI2_Graph");
+                        convertChartToImage(sourcePath + "\\SESS_WSI2_Graph.xlsx", sourcePath, "SESS_WSI2_Graph");
+                        convertChartToImage(sourcePath + "\\CPU_WSI2_Graph.xlsx", sourcePath, "CPU_WSI2_Graph");
+                        convertChartToImage(sourcePath + "\\MEM_WSI2_Graph.xlsx", sourcePath, "MEM_WSI2_Graph");
+                        convertChartToImage(sourcePath + "\\RESP_WSI2_Graph.xlsx", sourcePath, "RESP_WSI2_Graph");
+                    }
+                    catch(Exception ex)
+                    {
+                        //could not convert excel chart into image
+                    }
+               
                     //Copy Finished files to target folder
                     try
                     {
-                        Console.WriteLine("Copying " + sourcePath + " to " + netPath);
-                        CopyFolder(sourcePath, netPath);
+                        string[] today = DateTime.Now.ToString("MMM dd yyyy").Split(' ');
+                        if (today[0] == month && today[1] == day && today[2] == year)
+                        {
+
+                        }
+                        else
+                        {
+                            Console.WriteLine("Copying " + sourcePath + " to " + netPath);
+                            CopyFolder(sourcePath, netPath);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -102,7 +117,6 @@ namespace itcamScraper
                     foreach (Excel.ChartObject co in chartObjects)
                     {
                         Excel.Chart chart = (Excel.Chart)co.Chart;
-                        //                  app.Goto(co, true);
                         chart.Export(strDestPath + @"\" + name + ".png", "PNG", false);
                     }
                 }
